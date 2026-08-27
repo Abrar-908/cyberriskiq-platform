@@ -6,11 +6,11 @@ from typing import Dict, Any, List
 def optimize_security_investments(
     controls_df: pd.DataFrame,
     budget_limit: float,
-    current_ale: float = 3500000.0
+    current_ale: float = 35000000.0
 ) -> Dict[str, Any]:
     """
-    Mixed-Integer Linear Programming (MILP) Security Portfolio Optimization using PuLP.
-    Solves the 0-1 Knapsack / Portfolio Optimization problem to maximize risk reduction.
+    Mixed-Integer Linear Programming (MILP) Security Portfolio Optimization using PuLP in INR.
+    Maximizes expected risk reduction while strictly constraining total cost <= budget_limit.
     """
     prob = pulp.LpProblem("Cyber_Security_Investment_Optimization", pulp.LpMaximize)
     
@@ -21,10 +21,10 @@ def optimize_security_investments(
     benefits = []
     
     for i, (_, row) in enumerate(controls_df.iterrows()):
-        total_cost = float(row["Control Cost ($)"]) + float(row["Maintenance Cost ($)"])
-        eff = float(row["Control Effectiveness (%)"]) / 100.0
-        cov = float(row["Coverage Percentage (%)"]) / 100.0
-        raw_reduction = float(row["Risk Reduction ($)"])
+        total_cost = float(row["implementation_cost"]) + float(row["maintenance_cost"])
+        eff = float(row["effectiveness"]) / 100.0
+        cov = float(row["coverage"]) / 100.0
+        raw_reduction = float(row["risk_reduction_value"])
         
         weighted_benefit = raw_reduction * eff * cov
         costs.append(total_cost)
@@ -49,10 +49,11 @@ def optimize_security_investments(
     
     residual_ale_after_optimization = max(10000.0, current_ale - total_risk_reduced)
     roi_percentage = ((total_risk_reduced - total_spend) / total_spend * 100.0) if total_spend > 0 else 0.0
+    risk_reduction_pct = (total_risk_reduced / current_ale * 100.0) if current_ale > 0 else 0.0
     
-    # Generate Investment Efficient Frontier Curve (simulating budget steps from 20k to max cost)
+    # Generate Investment Efficient Frontier Curve (budget increments in INR)
     max_portfolio_cost = sum(costs)
-    budget_steps = np.linspace(25000, max_portfolio_cost * 1.05, 15)
+    budget_steps = np.linspace(200000, max_portfolio_cost * 1.05, 15)
     frontier_data = []
     
     for b in budget_steps:
@@ -67,10 +68,10 @@ def optimize_security_investments(
         b_reduced = sum([benefits[j] for j in b_selected])
         
         frontier_data.append({
-            "Budget ($)": round(b, 2),
-            "Actual Spend ($)": round(b_spend, 2),
-            "Max Risk Reduction ($)": round(b_reduced, 2),
-            "Residual ALE ($)": round(max(10000.0, current_ale - b_reduced), 2),
+            "Budget (INR)": round(b, 2),
+            "Actual Spend (INR)": round(b_spend, 2),
+            "Max Risk Reduction (INR)": round(b_reduced, 2),
+            "Residual ALE (INR)": round(max(10000.0, current_ale - b_reduced), 2),
             "Controls Count": len(b_selected)
         })
         
@@ -82,6 +83,7 @@ def optimize_security_investments(
         "unselected_controls_df": unselected_controls_df,
         "total_spend": total_spend,
         "total_risk_reduced": total_risk_reduced,
+        "risk_reduction_pct": round(risk_reduction_pct, 1),
         "residual_ale_after_optimization": residual_ale_after_optimization,
         "roi_percentage": round(roi_percentage, 1),
         "frontier_df": frontier_df

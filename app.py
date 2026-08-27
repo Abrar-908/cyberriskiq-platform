@@ -90,7 +90,7 @@ with st.sidebar:
     st.session_state.mc_simulations = mc_runs
 
     st.divider()
-    if st.button("🔄 Reset SQLite Database", use_container_width=True):
+    if st.button("🔄 Reset SQLite Database", width='stretch'):
         reset_to_defaults()
         st.success("Database restored to baseline seed data!")
         st.rerun()
@@ -167,7 +167,7 @@ with tab_exec:
             margin=dict(l=20, r=20, t=30, b=20),
             height=340
         )
-        st.plotly_chart(fig_lec, use_container_width=True)
+        st.plotly_chart(fig_lec, width='stretch')
 
     with col_heatmap:
         st.subheader("🗺️ 5x5 Threat-Asset Risk Matrix")
@@ -193,7 +193,7 @@ with tab_exec:
             margin=dict(l=20, r=20, t=30, b=20),
             height=340
         )
-        st.plotly_chart(fig_heat, use_container_width=True)
+        st.plotly_chart(fig_heat, width='stretch')
 
     # Probabilistic Quantiles and Top High-Risk Assets
     col_q, col_top_assets = st.columns([5, 6])
@@ -212,7 +212,7 @@ with tab_exec:
             text_auto='.1f'
         )
         fig_q.update_layout(paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(15,23,42,0.6)', font=dict(color='#94a3b8'), margin=dict(l=20, r=20, t=30, b=20), height=320)
-        st.plotly_chart(fig_q, use_container_width=True)
+        st.plotly_chart(fig_q, width='stretch')
 
     with col_top_assets:
         st.subheader("🚨 Top High-Risk Assets by Risk Score")
@@ -220,8 +220,7 @@ with tab_exec:
         top_asset_display["Asset Value"] = top_asset_display["Asset Value (INR)"].apply(format_inr)
         top_asset_display["Asset ALE"] = top_asset_display["Asset ALE (INR)"].apply(format_inr)
         st.dataframe(
-            top_asset_display[["Asset ID", "Asset Name", "Criticality", "Risk Score", "Asset ALE", "Risk Level"]],
-            use_container_width=True,
+            top_asset_display[["Asset ID", "Asset Name", "Criticality", "Risk Score", "Asset ALE", "Risk Level"]], width='stretch',
             height=320
         )
 
@@ -274,13 +273,13 @@ with tab_analysis:
             text_auto=True
         )
         fig_exp.update_layout(paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(15,23,42,0.6)', font=dict(color='#94a3b8'), yaxis=dict(autorange="reversed"), margin=dict(t=20, b=20, l=20, r=20), height=260)
-        st.plotly_chart(fig_exp, use_container_width=True)
+        st.plotly_chart(fig_exp, width='stretch')
 
     # Associated Active CVEs for selected asset
     st.markdown("#### ⚡ Active Vulnerabilities on this Asset")
     asset_cves = st.session_state.vulns_df[st.session_state.vulns_df["affected_asset"] == selected_asset_id]
     if len(asset_cves) > 0:
-        st.dataframe(asset_cves[["cve_id", "vulnerability_name", "cvss_score", "severity", "patch_status", "public_exploit", "kev_status"]], use_container_width=True)
+        st.dataframe(asset_cves[["cve_id", "vulnerability_name", "cvss_score", "severity", "patch_status", "public_exploit", "kev_status"]], width='stretch')
     else:
         st.info("No active unpatched vulnerabilities associated with this asset.")
 
@@ -317,8 +316,7 @@ with tab_opt:
         rec_disp["Maintenance Cost"] = rec_disp["maintenance_cost"].apply(format_inr)
         rec_disp["Risk Reduction Value"] = rec_disp["risk_reduction_value"].apply(format_inr)
         st.dataframe(
-            rec_disp[["control_id", "control_name", "category", "Implementation Cost", "Risk Reduction Value", "effectiveness", "coverage"]],
-            use_container_width=True
+            rec_disp[["control_id", "control_name", "category", "Implementation Cost", "Risk Reduction Value", "effectiveness", "coverage"]], width='stretch'
         )
 
         if len(opt_result["unselected_controls_df"]) > 0:
@@ -326,7 +324,7 @@ with tab_opt:
                 unfunded_disp = opt_result["unselected_controls_df"].copy()
                 unfunded_disp["Cost"] = unfunded_disp["implementation_cost"].apply(format_inr)
                 unfunded_disp["Potential Risk Reduction"] = unfunded_disp["risk_reduction_value"].apply(format_inr)
-                st.dataframe(unfunded_disp[["control_id", "control_name", "Cost", "Potential Risk Reduction"]], use_container_width=True)
+                st.dataframe(unfunded_disp[["control_id", "control_name", "Cost", "Potential Risk Reduction"]], width='stretch')
 
     with col_frontier:
         st.markdown("#### 📉 Security Investment Efficient Frontier Curve")
@@ -341,7 +339,7 @@ with tab_opt:
         )
         fig_front.add_vline(x=st.session_state.budget_limit, line_dash="dash", line_color="#38bdf8", annotation_text="Your Budget")
         fig_front.update_layout(paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(15,23,42,0.6)', font=dict(color='#94a3b8'), margin=dict(l=20, r=20, t=40, b=20), height=340)
-        st.plotly_chart(fig_front, use_container_width=True)
+        st.plotly_chart(fig_front, width='stretch')
 
 # ==========================================
 # TAB 4: AI/ML RISK ENGINE
@@ -374,7 +372,7 @@ with tab_ml:
             color_continuous_scale="Tealgrn"
         )
         fig_fi.update_layout(paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(15,23,42,0.6)', font=dict(color='#94a3b8'), yaxis=dict(autorange="reversed"), margin=dict(t=20, b=20, l=20, r=20), height=380)
-        st.plotly_chart(fig_fi, use_container_width=True)
+        st.plotly_chart(fig_fi, width='stretch')
 
     with col_sb:
         st.markdown("#### 🧪 Interactive What-If Scenario Sandbox")
@@ -470,7 +468,7 @@ with tab_incidents:
 
     st.markdown("<br>", unsafe_allow_html=True)
     inc_disp["Financial Loss"] = inc_disp["financial_loss"].apply(format_inr)
-    st.dataframe(inc_disp[["incident_id", "date", "incident_type", "affected_asset", "Financial Loss", "downtime_hours", "root_cause", "severity"]], use_container_width=True)
+    st.dataframe(inc_disp[["incident_id", "date", "incident_type", "affected_asset", "Financial Loss", "downtime_hours", "root_cause", "severity"]], width='stretch')
 
 # ==========================================
 # TAB 7: ASSET & SECURITY TELEMETRY (CRUD)
@@ -481,7 +479,7 @@ with tab_assets:
 
     with sub_tab_a:
         st.markdown("##### 🏛️ Enterprise Assets (CRUD)")
-        edited_a = st.data_editor(st.session_state.assets_df, num_rows="dynamic", use_container_width=True)
+        edited_a = st.data_editor(st.session_state.assets_df, num_rows="dynamic", width='stretch')
         if not edited_a.equals(st.session_state.assets_df):
             st.session_state.assets_df = edited_a
             save_dataframe_to_db("assets", edited_a)
@@ -490,7 +488,7 @@ with tab_assets:
 
     with sub_tab_v:
         st.markdown("##### ⚡ Vulnerability Tracking (CRUD)")
-        edited_v = st.data_editor(st.session_state.vulns_df, num_rows="dynamic", use_container_width=True)
+        edited_v = st.data_editor(st.session_state.vulns_df, num_rows="dynamic", width='stretch')
         if not edited_v.equals(st.session_state.vulns_df):
             st.session_state.vulns_df = edited_v
             save_dataframe_to_db("vulnerabilities", edited_v)
@@ -499,7 +497,7 @@ with tab_assets:
 
     with sub_tab_t:
         st.markdown("##### 🎯 Threat Actors & Scenarios (CRUD)")
-        edited_t = st.data_editor(st.session_state.threats_df, num_rows="dynamic", use_container_width=True)
+        edited_t = st.data_editor(st.session_state.threats_df, num_rows="dynamic", width='stretch')
         if not edited_t.equals(st.session_state.threats_df):
             st.session_state.threats_df = edited_t
             save_dataframe_to_db("threats", edited_t)
@@ -508,7 +506,7 @@ with tab_assets:
 
     with sub_tab_c:
         st.markdown("##### 🔒 Security Control Parameters (CRUD)")
-        edited_c = st.data_editor(st.session_state.controls_df, num_rows="dynamic", use_container_width=True)
+        edited_c = st.data_editor(st.session_state.controls_df, num_rows="dynamic", width='stretch')
         if not edited_c.equals(st.session_state.controls_df):
             st.session_state.controls_df = edited_c
             save_dataframe_to_db("security_controls", edited_c)
@@ -527,7 +525,7 @@ with tab_mitre:
         cve_q = st.text_input("Enter CVE Identifier:", value="CVE-2023-34362")
     with cve_b_col:
         st.markdown("<div style='height: 28px;'></div>", unsafe_allow_html=True)
-        cve_btn = st.button("Query NVD API", use_container_width=True)
+        cve_btn = st.button("Query NVD API", width='stretch')
 
     if cve_btn and cve_q:
         with st.spinner("Fetching CVE telemetry..."):
@@ -535,7 +533,7 @@ with tab_mitre:
             st.info(f"**{info['cve_id']}** ({info['severity']} | CVSS {info['cvss_score']} | Attack Vector: {info['attack_vector']} | Source: {info['source']})\n\n{info['description']}")
 
     st.markdown("#### 🛡️ MITRE ATT&CK Enterprise Tactical Matrix Mapping")
-    st.dataframe(pd.DataFrame(get_mitre_attack_matrix()), use_container_width=True)
+    st.dataframe(pd.DataFrame(get_mitre_attack_matrix()), width='stretch')
 
 # ==========================================
 # TAB 9: EXECUTIVE REPORT & EXPORT
@@ -566,22 +564,19 @@ with tab_reports:
             label="Download Assets CSV",
             data=st.session_state.assets_df.to_csv(index=False),
             file_name="cyberrisk_assets.csv",
-            mime="text/csv",
-            use_container_width=True
+            mime="text/csv", width='stretch'
         )
     with exp_col2:
         st.download_button(
             label="Download Risk Rankings CSV",
             data=fair_metrics["asset_risk_df"].to_csv(index=False),
             file_name="cyberrisk_asset_rankings.csv",
-            mime="text/csv",
-            use_container_width=True
+            mime="text/csv", width='stretch'
         )
     with exp_col3:
         st.download_button(
             label="Download Recommended Controls CSV",
             data=opt_result["selected_controls_df"].to_csv(index=False),
             file_name="recommended_security_portfolio.csv",
-            mime="text/csv",
-            use_container_width=True
+            mime="text/csv", width='stretch'
         )
